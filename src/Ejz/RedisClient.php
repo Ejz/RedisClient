@@ -11,9 +11,9 @@ class RedisClient
     private $socket;
 
     /**
-     * @param array $config
+     * @param array $config (optional)
      */
-    public function __construct(array $config)
+    public function __construct(array $config = [])
     {
         $this->config = $config + [
             'host' => 'localhost:6379',
@@ -25,7 +25,7 @@ class RedisClient
     }
 
     /**
-     * @param ... $args
+     * @param ...$args
      *
      * @return array
      */
@@ -40,8 +40,7 @@ class RedisClient
     }
 
     /**
-     * @param string $method
-     * @param array  $args
+     * @param ...$args
      *
      * @return mixed
      */
