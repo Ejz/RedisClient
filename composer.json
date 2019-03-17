@@ -1,6 +1,6 @@
 {
     "name": "ejz/redisclient",
-    "description": "Simple Redis client!",
+    "description": "ejz/redisclient",
     "keywords": ["ejz", "redis", "client"],
     "license": "WTFPL",
     "repositories": [
