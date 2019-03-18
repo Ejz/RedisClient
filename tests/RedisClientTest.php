@@ -5,6 +5,9 @@ use PHPUnit\Framework\TestCase;
 
 class RedisClientTest extends TestCase
 {
+    /** @var RedisClient */
+    private $redis;
+
     /**
      *
      */
