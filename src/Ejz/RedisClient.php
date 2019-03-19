@@ -16,8 +16,9 @@ class RedisClient
     public function __construct(array $config = [])
     {
         $this->config = $config + [
-            'host' => 'localhost:6379',
-            'auth' => '',
+            'host' => 'localhost',
+            'port' => 6379,
+            'auth' => false,
             'persistent' => false,
             'select' => 0,
             'timeout' => 5,
@@ -101,7 +102,7 @@ class RedisClient
         }
         $flags = STREAM_CLIENT_CONNECT | ($this->config['persistent'] ? STREAM_CLIENT_PERSISTENT : 0);
         @ $socket = stream_socket_client(
-            $this->config['host'],
+            $this->config['host'] . ':' . $this->config['port'],
             $errno,
             $errstr,
             $this->config['timeout'],
@@ -111,8 +112,11 @@ class RedisClient
             throw new RedisClientException($errstr);
         }
         $this->socket = $socket;
-        if ($this->config['auth'] !== '') {
+        if ($this->config['auth']) {
             $this->AUTH($this->config['auth']);
+        }
+        if ($this->config['select']) {
+            $this->SELECT($this->config['select']);
         }
         return $this->socket;
     }
