@@ -55,4 +55,16 @@ class RedisClientTest extends TestCase
         $ret = $this->redis->EXISTS(md5(time()));
         $this->assertTrue($ret === 0);
     }
+
+    /**
+     * @test
+     */
+    public function test_redis_client_large_string()
+    {
+        $string = str_repeat(md5(microtime(1)), 10000);
+        $this->redis->SET('_', $string);
+        $this->assertEquals(strlen($string), $this->redis->STRLEN('_'));
+        $this->assertEquals(strlen($string), strlen($this->redis->GET('_')));
+        $this->redis->DEL('_');
+    }
 }

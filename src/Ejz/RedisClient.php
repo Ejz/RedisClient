@@ -22,6 +22,7 @@ class RedisClient
             'persistent' => false,
             'select' => 0,
             'timeout' => 5,
+            'chunk' => 1024,
         ];
     }
 
@@ -84,11 +85,21 @@ class RedisClient
      */
     private function send(array $args)
     {
-        $cmd = '*' . count($args) . "\r\n";
+        $cmd = ['*' . count($args) . "\r\n"];
         foreach ($args as $item) {
-            $cmd .= '$' . strlen($item) . "\r\n" . $item . "\r\n";
+            $cmd[] = '$' . strlen($item) . "\r\n" . $item . "\r\n";
         }
-        fwrite($this->getSocket(), $cmd);
+        $cmd = implode($cmd);
+        $len = strlen($cmd);
+        $written = 0;
+        $socket = $this->getSocket();
+        do {
+            $res = fwrite($socket, substr($cmd, $written));
+            if ($res === false) {
+                throw new RedisClientException('fwrite() returned FALSE');
+            }
+            $written += $res;
+        } while ($written !== $len);
         return $this->getResponse();
     }
 
@@ -127,6 +138,7 @@ class RedisClient
     private function getResponse()
     {
         $socket = $this->getSocket();
+        $chunk = $this->config['chunk'];
         $line = fgets($socket);
         [$type, $result] = [$line[0], substr($line, 1, strlen($line) - 3)];
         if ($type == '-') {
@@ -137,8 +149,19 @@ class RedisClient
             if ($result == -1) {
                 $result = null;
             } else {
-                $line = fread($socket, $result + 2);
-                $result = substr($line, 0, strlen($line) - 2);
+                $len = $result + 2;
+                $read = 0;
+                $lines = [];
+                do {
+                    $res = fread($socket, min($chunk, $len));
+                    if ($res === false) {
+                        throw new RedisClientException('fread() returned FALSE');
+                    }
+                    $len -= strlen($res);
+                    $lines[] = $res;
+                } while ($read !== $len);
+                $result = implode($lines);
+                $result = substr($result, 0, strlen($result) - 2);
             }
         } elseif ($type == '*') {
             $count = (int) $result;
