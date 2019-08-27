@@ -93,13 +93,16 @@ class RedisClient
         $len = strlen($cmd);
         $written = 0;
         $socket = $this->getSocket();
+        $tries = 3;
         do {
+            $tries--;
             $res = fwrite($socket, substr($cmd, $written));
-            if ($res === false) {
-                throw new RedisClientException('fwrite() returned FALSE');
+            if ($res === false || ($res <= 0 && !$tries)) {
+                throw new RedisClientException('fwrite() error');
             }
+            $tries = $res > 0 ? 3 : $tries;
             $written += $res;
-        } while ($written !== $len);
+        } while ($written !== $len && ($res > 0 || !usleep(300000)));
         return $this->getResponse();
     }
 
