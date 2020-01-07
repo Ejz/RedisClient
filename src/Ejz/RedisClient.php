@@ -98,7 +98,7 @@ class RedisClient
             $tries--;
             $res = fwrite($socket, substr($cmd, $written));
             if ($res === false || ($res <= 0 && !$tries)) {
-                throw new RedisClientException('fwrite() error');
+                throw new RedisClientException('fwrite() ERROR');
             }
             $tries = $res > 0 ? 3 : $tries;
             $written += $res;
@@ -143,6 +143,9 @@ class RedisClient
         $socket = $this->getSocket();
         $chunk = $this->config['chunk'];
         $line = fgets($socket);
+        if ($line === false) {
+        	throw new RedisClientException('fgets() returned FALSE');
+        }
         [$type, $result] = [$line[0], substr($line, 1, strlen($line) - 3)];
         if ($type == '-') {
             throw new RedisClientException($result);
