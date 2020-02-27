@@ -136,6 +136,16 @@ class RedisClient
     }
 
     /**
+     */
+    public function close()
+    {
+        if ($this->socket) {
+            fclose($this->socket);
+            $this->socket = null;
+        }
+    }
+
+    /**
      * @return mixed
      */
     private function getResponse()
