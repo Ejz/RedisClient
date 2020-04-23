@@ -1,7 +1,7 @@
 {
     "name": "ejz/redisclient",
-    "description": "ejz/redisclient",
-    "keywords": ["ejz", "redis", "client"],
+    "description": "",
+    "keywords": [],
     "license": "WTFPL",
     "repositories": [
         {
@@ -9,17 +9,15 @@
             "url": "https://github.com/Ejz/RedisClient"
         }
     ],
-    "authors": [
-        {
-            "name": "Evgeny Cernisev",
-            "email": "ejz@ya.ru",
-            "homepage": "https://ejz.io"
-        }
-    ],
+    "authors": [],
     "require": {
-        "php": ">=7.1.0"
+        "php": ">=7.4.0"
     },
     "autoload": {
         "psr-4": {"Ejz\\": "src/Ejz"}
+    },
+    "require-dev": {
+        "composer/composer": "^1.10",
+        "phpunit/phpunit": "^9.1"
     }
 }
